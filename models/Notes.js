@@ -21,3 +21,6 @@ const notesSchema = new mongoose.Schema({
 })
 
 module.exports = models.Schema('Notes',notesSchema);
+
+
+// Exporting in express is always done by 'module.exports'

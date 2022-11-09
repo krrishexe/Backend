@@ -21,3 +21,8 @@ const userSchema = new mongoose.Schema({
 })
 
 module.exports = mongoose.model('User','userSchema')
+
+
+
+
+// Exporting in express is always done by 'module.exports'
