@@ -3,14 +3,18 @@ const express = require('express')
 
 connectToMongo();
 
-
-                                    // this below code from expressJS documentation.
+                                        // this below code from expressJS documentation.
 
 const app = express()
 const port = 3000
-app.get('/', (req, res) => {                    // .get() ke andar jo url request marte hai usko endpoint bolte  
-    res.send('Hello World!')
-})
+                                        // .get() ke andar jo url request marte hai usko endpoint bolte  
+
+app.use('/api/auth',require('./routes/auth'))
+app.use('/api/notes',require('./routes/notes'))
+
+// app.get('/', (req, res) => {                    
+//     res.send('Hello signup!')
+// })
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
