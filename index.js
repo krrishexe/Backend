@@ -10,6 +10,9 @@ const port = 3000
                                         // .get() ke andar jo url request marte hai usko endpoint bolte  
                     //Available Routes
 
+
+app.use(express.json())     // Middleware , To use req.body , we need to use this middleware.
+
 app.use('/api/auth',require('./routes/auth'))
 app.use('/api/notes',require('./routes/notes'))
 

@@ -11,16 +11,16 @@ const userSchema = new mongoose.Schema({
         unique:true
     },
     password:{
-        type:password,
+        type:Number,
         required:true
     },
     date:{
         type:Date,
-        default: Date.now
+        default: Date.now()
     }
 })
 
-module.exports = mongoose.model('User','userSchema')
+module.exports = mongoose.model('User',userSchema)
 
 
 
