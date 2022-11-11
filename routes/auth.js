@@ -1,21 +1,14 @@
 const express = require('express')
 const router = express.Router()
-const User = require('../models/User.js');
-
-
+const User = require('../models/User');
 
 // Create a user using: POST "/api/auth/" .   --> is endpoint pe post request marni hai data ke liye 
 
 
-router.get('/',(req,res)=>{ 
-
-
-
+router.post('/',async(req,res)=>{ 
     console.log(req.body);
-    
     const user = User(req.body);
-    user.save()
-
+    await user.save()
     // REQ.BODY --> req.body  kya hai ??
     // body of the json file we are requesting.
                                     
@@ -28,8 +21,9 @@ router.get('/',(req,res)=>{
     // }
     // res.json([])
 })
+module.exports = router             
 
-module.exports = router             //Exporting the router
+//Exporting the router
 
 
 // Exporting in express is always done by 'module.exports'
