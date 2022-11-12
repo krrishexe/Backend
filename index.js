@@ -6,7 +6,7 @@ connectToMongo();
                                         // this below code from expressJS documentation.
 
 const app = express()
-const port = 3000
+const port = 5000
                                         // .get() ke andar jo url request marte hai usko endpoint bolte  
                     //Available Routes
 
