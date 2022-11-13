@@ -3,12 +3,13 @@ const router = express.Router()
 const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+var jwt = require('jsonwebtoken');
 
 
 
 // Create a user using: POST "/api/auth/" .   --> is endpoint pe post request marni hai data ke liye 
 
-
+const JWT_message = "hello, my name is krish";
 
 router.post('/', [
 
@@ -30,7 +31,6 @@ router.post('/', [
             return res.status(400).json({ errors: "sorry a user with this email already exist" })
         }
 
-
         const salt = await bcrypt.genSalt(10);
         const secPass = await bcrypt.hash(req.body.password, salt);  // await kyu ? bcz it returns promise
         // Created an new user
@@ -39,7 +39,20 @@ router.post('/', [
             password: secPass,
             email: req.body.email,
         })
-        res.json(user)
+        const data ={
+            user:{
+                id:user.id
+            }
+        }
+
+        const jwtData = jwt.sign(data,JWT_message);
+
+        console.log(jwtData);
+        
+        res.json({jwtData})
+
+        // res.json(user)
+
     } catch (error) {
         console.log(error.message);
         res.status(500).send("some error occured");
