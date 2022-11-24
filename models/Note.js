@@ -1,6 +1,11 @@
 const mongoose = require('mongoose')
+const { Schema } = mongoose;
 
 const notesSchema = new mongoose.Schema({
+    user :{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'user'
+    },
     title:{
         type :String,
         required : true
@@ -20,7 +25,8 @@ const notesSchema = new mongoose.Schema({
     }
 })
 
-module.exports = models.Schema('Notes',notesSchema);
+
+module.exports = mongoose.model('Notes',notesSchema);
 
 
 // Exporting in express is always done by 'module.exports'

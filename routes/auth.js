@@ -17,7 +17,7 @@ const JWT_message = "hello, my name is krish";
 router.post('/createuser', [
 
     body('name','Enter a valid Name').isLength({ min: 3 }),
-    body('password').isLength({ min: 5 }),       // we created an array to store validations !!
+    body('password').isLength({ min: 5 }),                      // we created an array to store validations !!
     body('email','Enter a valid E-mail').isEmail()
 
 ], async (req, res) => {
