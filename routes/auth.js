@@ -7,15 +7,15 @@ var jwt = require('jsonwebtoken');
 
 
 
-// Create a user using: POST "/api/auth/" .   --> is endpoint pe post request marni hai data ke liye 
+// Create a user using: POST "/api/auth/createuser" .   --> is endpoint pe post request marni hai data ke liye 
 
 const JWT_message = "hello, my name is krish";
 
-router.post('/', [
+router.post('/createuser', [
 
-    body('name').isLength({ min: 3 }),
+    body('name','Enter a valid Name').isLength({ min: 3 }),
     body('password').isLength({ min: 5 }),       // we created an array to store validations !!
-    body('email').isEmail()
+    body('email','Enter a valid E-mail').isEmail()
 
 ], async (req, res) => {
 
@@ -33,7 +33,14 @@ router.post('/', [
 
         const salt = await bcrypt.genSalt(10);
         const secPass = await bcrypt.hash(req.body.password, salt);  // await kyu ? bcz it returns promise
-        // Created an new user
+
+
+
+
+
+                        // ********VIP************ Copy pasted from express validator site.
+                        // Creates an new user
+
         user = await User.create({
             name: req.body.name,
             password: secPass,
@@ -45,20 +52,68 @@ router.post('/', [
             }
         }
 
-        const jwtData = jwt.sign(data,JWT_message);
+        const authToken = jwt.sign(data,JWT_message);
 
-        console.log(jwtData);
+        console.log(authToken);
         
-        res.json({jwtData})
+        res.json({authToken})
 
-        // res.json(user)
+        // res.json(user)   ---->> json file me user ko daal do.
 
     } catch (error) {
         console.log(error.message);
-        res.status(500).send("some error occured");
+        res.status(500).send("Internal Error Occured");
     }
 
 })
+
+
+// Authenticate a user using: POST "/api/auth/createuser" .   --> is endpoint pe post request marni hai data ke liye 
+
+router.post('/login', [
+
+    body('email','Enter a valid E-mail').isEmail(),
+    body('password','Password cannot be empty').exists()
+
+], async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const {email,password} = req.body;
+    try {
+        let user = await User.findOne({email})
+        if(!user){
+            return res.status(400).json({error : "Sorry the user does not exist"})
+        }
+
+        let passwordCompare = await bcrypt.compare(password,user.password)
+
+        if(!passwordCompare){
+            return res.status(400).json({error : "Sorry the user does not exist"})
+        }
+        const data ={
+            user:{
+                id:user.id
+            }
+        }
+
+        const authToken = jwt.sign(data,JWT_message);      
+        res.json({authToken})
+
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send("Interal Error Occured");
+    }
+
+
+})
+
+
+
 module.exports = router
 
 //Exporting the router
@@ -66,25 +121,5 @@ module.exports = router
 
 // Exporting in express is always done by 'module.exports'
 
+// user.save() saves the data of the user in the database .
 
-
-
-
-
-
-
-
-// .then(user => res.json(user));
-    // console.log(req.body);
-    // const user = User(req.body);
-    // await user.save()
-    // REQ.BODY --> req.body  kya hai ??
-    // body of the json file we are requesting.
-
-    // res.send(req.body)
-
-    // obj={
-    //     a:'this',
-    //     number:69,
-    //     name:'krish',
-    // }
