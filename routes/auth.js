@@ -4,12 +4,15 @@ const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
+const fetchuser = require("../middleware/fetchuser")
 
 
 
 // Create a user using: POST "/api/auth/createuser" .   --> is endpoint pe post request marni hai data ke liye 
-
+// NO Login Required.
 const JWT_message = "hello, my name is krish";
+
+                    // *************************** ROUTE 1 **************************
 
 router.post('/createuser', [
 
@@ -70,6 +73,10 @@ router.post('/createuser', [
 
 // Authenticate a user using: POST "/api/auth/createuser" .   --> is endpoint pe post request marni hai data ke liye 
 
+// no login required.
+
+                    // *************************** ROUTE 2 **************************
+
 router.post('/login', [
 
     body('email','Enter a valid E-mail').isEmail(),
@@ -108,13 +115,25 @@ router.post('/login', [
         console.log(error.message);
         res.status(500).send("Interal Error Occured");
     }
+});
 
+                    // *************************** ROUTE 3 **************************
 
+// Get Logged in user detail using : POST "/api/auth/getuser"   ***** LOgin Required ****
+
+router.post('/getuser',fetchuser, async (req, res) => { 
+
+try {
+    userId = req.user.id;
+    const user = await User.findById(userId).select("-password");
+    res.send(user);
+}catch (error) {
+    console.log(error.message);
+    res.status(500).send("Interal Error Occured");
+}
 })
 
-
-
-module.exports = router
+module.exports = router;
 
 //Exporting the router
 
