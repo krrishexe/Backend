@@ -17,18 +17,18 @@ router.get('/fetchallnotes', fetchuser, async (req, res) => {
     //Bascially getting the user id
 
     try {
-        const notes = await Note.find({ user: req.user.id })         
+        const notes = await Note.find({ user: req.user.id })
         res.json(notes)
-        
-    }catch (error) {
+
+    } catch (error) {
         console.log(error.message);
-        res.status(500).send("Interal Error Occured");
+        res.status(500).send("Interal Server Error Occured");
     }
 })
 
 // *************************** ROUTE 2 **************************
 
-// Add notes of the user using  : GET "/api/notes/addnote notes"   ***** LOgin Required ****
+// Add notes of the user using  : POST "/api/notes/addnote notes"   ***** LOgin Required ****
 
 router.post('/addnote', fetchuser, [
 
@@ -40,7 +40,7 @@ router.post('/addnote', fetchuser, [
 
         // destructuring se --> req.body ke andar ke data ko bahar nikalna 
 
-        const { title, description, tag ,image} = req.body;
+        const { title, description, tag, image } = req.body;
 
         //if there are errors then return bad requests and errors.
 
@@ -51,16 +51,16 @@ router.post('/addnote', fetchuser, [
 
         const note = new Note({
 
-            title, description, tag,image, user: req.user.id
+            title, description, tag, image, user: req.user.id
 
         })
 
         const savedNote = await note.save()
 
         res.json(savedNote)
-    }catch (error) {
+    } catch (error) {
         console.log(error.message);
-        res.status(500).send("Interal Error Occured");
+        res.status(500).send("Interal Server Error Occured");
     }
 
 })
@@ -68,7 +68,7 @@ router.post('/addnote', fetchuser, [
 
 // *************************** ROUTE 3 **************************
 
-// Update the notes of the user using  : GET "/api/notes/updatenote notes"   ***** LOgin Required ****
+// Update the notes of the user using  : PUT "/api/notes/updatenote notes"   ***** LOgin Required ****
 
 // Here /:id / -->   is (particular note ID)  -->   req.params.id 
 
@@ -79,32 +79,73 @@ router.put('/updatenote/:id', fetchuser, [
 
 ], async (req, res) => {
 
-    const { title, description, tag, image} = req.body;
-    
+    const { title, description, tag, image } = req.body;
+
     // create a new Note object 
 
     // if the title , description or tag is updated then update it to the new object newNote.
 
-    const newNote = {};
-    if(title){newNote.title = title};
-    if(description){newNote.description = description};
-    if(tag){newNote.tag = tag};
-    if(image){newNote.image = image};
+    try {
+        const newNote = {};
+        if (title) { newNote.title = title };
+        if (description) { newNote.description = description };
+        if (tag) { newNote.tag = tag };
+        if (image) { newNote.image = image };
 
-    // Find the note to be updated and update it 
+        // Find the note to be updated and update it 
 
-    let note = await Note.findById(req.params.id);    // --> Found the note  
+        let note = await Note.findById(req.params.id);    // --> Found the note  
 
-    if(!note){return res.status(404).send("Note Not Found")} // if note is not found , then return error
+        if (!note) { return res.status(404).send("Note Not Found") } // if note is not found , then return error
 
-    if(note.user.toString() !== req.user.id){           // you cant update others notes
-        return res.status(401).send("not allowed")
+        if (note.user.toString() !== req.user.id) {           // you cant update others notes
+            return res.status(401).send("not allowed")
+        }
+
+        note = await Note.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true })     // --> Updated Note
+        res.json(note);
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send("Interal Server Error Occured");
     }
 
-    note = await Note.findByIdAndUpdate(req.params.id , {$set: newNote},{new:true})
-    res.json(note);
+})
+
+
+
+// *************************** ROUTE 4 **************************
+
+// delete the notes of the user using  : DELETE "/api/notes/deletenote notes"   ***** LOgin Required ****
+
+
+router.delete('/deletenote/:id', fetchuser, async (req, res) => {
+
+    // Find the note to delete and delete it 
+
+    try {
+        let note = await Note.findById(req.params.id);    // --> Found the note  
+
+        if (!note) { return res.status(404).send("Note Not Found") } // if note is not found , then return error
+
+
+        // ALLOW deletion only if the user owns the note
+
+
+        if (note.user.toString() !== req.user.id) {         // you cant update others notes
+            return res.status(401).send("Not allowed")
+        }
+
+        note = await Note.findByIdAndDelete(req.params.id) // --> delete Note
+        res.json({ "Success": "Note has been Deleted", note: note });
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send("Interal Server Error Occured");
+    }
 
 })
+
 
 
 
