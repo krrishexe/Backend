@@ -14,6 +14,10 @@ const notesSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
+    image:{
+        type:String,
+        default:"../media/images/Screenshot_2020-12-26_004553.jpg"
+    },
     tag:{
         type:String,
         default:"green",
